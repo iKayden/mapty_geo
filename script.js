@@ -1,7 +1,7 @@
 'use strict';
 
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
+// Application Architecture
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
 const inputType = document.querySelector('.form__input--type');
@@ -55,11 +55,39 @@ class App {
   }
 
   _newWorkout(e) {
+    // Helper functions for validation
+    const validInputs = (...inputs) => inputs.every(input => Number.isFinite(input));
+    const positiveInts = (...inputs) => inputs.every(input => input > 0);
     e.preventDefault();
+    // Get data from the form
+    const type = inputType.value;
+    // "+" transforms it into an integer
+    const distance = +inputDistance.value;
+    const duration = +inputDuration.value;
+    // Create an object depending on type of workout
+    if (type === "running") {
+      const cadence = +inputCadence.value;
+      // Validation of data (checks for valid numbers)
+      if (!validInputs(distance, duration, cadence) || !positiveInts(distance, duration, cadence)
+      ) return alert("Inputs have to be positive numbers");
+    }
+    if (type === "cycling") {
+      const elevation = +inputElevation.value;
+      // Validation of data
+      if (!validInputs(distance, duration, elevation) || !positiveInts(distance, duration)
+      ) return alert("Inputs have to be positive numbers");
+    }
+
+
+    //add new object to workout arr
+
+
+    // render workout on the list
     // Display marker after form is filled and submitted
     const { lat, lng } = this.#mapEvent.latlng;
     const coords = [lat, lng];
 
+    // render workout on the map as marker
     L.marker(coords)
       .addTo(this.#map)
       .bindPopup(L.popup({
