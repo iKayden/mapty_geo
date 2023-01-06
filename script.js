@@ -10,12 +10,14 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+let map, mapEvent;// will keep the state of the map
+
 if (navigator.geolocation)
   navigator.geolocation.getCurrentPosition((position) => {
     const { latitude, longitude } = position.coords;
     const coords = [latitude, longitude];
 
-    const map = L.map('map').setView(coords, 13);
+    map = L.map('map').setView(coords, 13);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -23,8 +25,9 @@ if (navigator.geolocation)
 
 
     // part of Leaflet library (on())
-    // add markers on the map where user clicked
-    map.on("click", function(mapEvent) {
+    // add markers on the map where user clicked (handling clicks on map)
+    map.on("click", function(eMap) {
+      mapEvent = eMap; // Set state of the map (moves it to the global variable)
       form.classList.remove("hidden");
       inputDistance.focus();
 
@@ -35,9 +38,12 @@ if (navigator.geolocation)
   });
 
 form.addEventListener("submit", function(e) {
+  e.preventDefault();
   // Display marker after form is filled and submitted
   const { lat, lng } = mapEvent.latlng;
   const coords = [lat, lng];
+
+
   L.marker(coords)
     .addTo(map)
     .bindPopup(L.popup({
@@ -49,4 +55,13 @@ form.addEventListener("submit", function(e) {
     }))
     .setPopupContent("Workout")
     .openPopup();
+
+  // Clear input fields and hide form
+  inputCadence.value = inputDistance.value = inputDuration.value = inputElevation.value = "";
+  form.classList.add("hidden");
+});
+
+inputType.addEventListener("change", function(e) {
+  inputElevation.closest(".form__row").classList.toggle("form__row--hidden");
+  inputCadence.closest(".form__row").classList.toggle("form__row--hidden");
 });
