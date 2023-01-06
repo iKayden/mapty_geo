@@ -12,30 +12,52 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 let map, mapEvent;// will keep the state of the map
 
-if (navigator.geolocation)
-  navigator.geolocation.getCurrentPosition((position) => {
+class App {
+  #map; // Private Instance Properties
+  #mapEvent;
+  constructor() { //Called immediately when a new instance of this class is created
+    this._getPosition(); // gets current position at the start
+  }
+
+  _getPosition() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        this._loadMap.bind(this), //use the coords from this to load map
+        (error) => {
+          alert("Could not get your position");
+        });
+    }
+  }
+
+  _loadMap(position) {
     const { latitude, longitude } = position.coords;
     const coords = [latitude, longitude];
 
-    map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, 13);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
+    }).addTo(this.#map);
 
     // part of Leaflet library (on())
     // add markers on the map where user clicked (handling clicks on map)
-    map.on("click", function(eMap) {
-      mapEvent = eMap; // Set state of the map (moves it to the global variable)
+    this.#map.on("click", function(eMap) {
+      this.#mapEvent = eMap; // Set state of the map (moves it to the global variable)
       form.classList.remove("hidden");
       inputDistance.focus();
 
     });
 
-  }, (error) => {
-    alert("Could not get your position");
-  });
+  };
+
+  _showForm() { }
+
+  _toggleElevationField() { }
+
+  _newWorkout() { }
+}
+// Initializing the App class
+const app = new App();
 
 form.addEventListener("submit", function(e) {
   e.preventDefault();
