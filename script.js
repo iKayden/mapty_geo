@@ -49,6 +49,15 @@ class App {
     inputDistance.focus();
   }
 
+  _hideForm(e) {
+    // empty inputs
+    inputCadence.value = inputDistance.value = inputDuration.value = inputElevation.value = "";
+    // imitates replacing of the form to the new workout display
+    form.style.display = "none";
+    form.classList.add("hidden");
+    setTimeout(() => form.style.display = "grid", 1000);
+  }
+
   _toggleElevationField(e) {
     inputElevation.closest(".form__row").classList.toggle("form__row--hidden");
     inputCadence.closest(".form__row").classList.toggle("form__row--hidden");
@@ -103,8 +112,7 @@ class App {
     this._renderWorkoutMarker(workout);
 
     // Clear input fields and hide form
-    inputCadence.value = inputDistance.value = inputDuration.value = inputElevation.value = "";
-    form.classList.add("hidden");
+    this._hideForm();
   }
 
   _renderWorkoutMarker(workout) {
@@ -118,7 +126,7 @@ class App {
         closeOnClick: false,
         className: `${workout.type}-popup`
       }))
-      .setPopupContent(`${workout.type}`)
+      .setPopupContent(`${workout.type === "running" ? "🏃‍♂️" : "🚴‍♀️"} ${workout.description}`)
       .openPopup();
   }
   _renderWorkout(workout) {
@@ -164,6 +172,8 @@ class App {
           </div>
         </li>
       `;
+
+    form.insertAdjacentHTML("afterend", html);
   }
 }
 
