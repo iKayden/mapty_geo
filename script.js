@@ -11,12 +11,14 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 class App {
   #map; // Private Instance Properties
+  #mapZoomLvl = 13;
   #mapEvent;
   #workouts = []; // Initialized with an empty arr
   constructor() { //Called immediately when a new instance of this class is created
     this._getPosition(); // gets current position at the start
     form.addEventListener("submit", this._newWorkout.bind(this));
     inputType.addEventListener("change", this._toggleElevationField);
+    containerWorkouts.addEventListener("click", this._moveToPopup.bind(this));
   }
 
   _getPosition() {
@@ -33,7 +35,7 @@ class App {
     const { latitude, longitude } = position.coords;
     const coords = [latitude, longitude];
 
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLvl);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -103,7 +105,6 @@ class App {
 
     // After Passing Validation Add new object to workout arr
     this.#workouts.push(workout);
-    console.log(workout);
 
     // render workout on the list
     this._renderWorkout(workout);
@@ -175,6 +176,16 @@ class App {
 
     form.insertAdjacentHTML("afterend", html);
   }
+
+  _moveToPopup(e) { // When workout is clicked it will move map to the precise location
+    const workoutEl = e.target.closest(".workout"); //getter for the div with clicked on workout
+    if (!workoutEl) return;
+    const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id);
+    this.#map.setView(workout.coords, this.#mapZoomLvl, {
+      animate: true,
+      pan: { duration: 1 }
+    });
+  }
 }
 
 class Workout {
@@ -224,6 +235,8 @@ class Cycling extends Workout {
     this.speed = Math.round(this.duration / (this.distance / 60));
     return this.speed;
   }
+
+
 
 }
 // Initializing the App class
