@@ -185,13 +185,17 @@ class App {
       animate: true,
       pan: { duration: 1 }
     });
+    // Using Public Interface
+    workout.click();
   }
+
 }
 
 class Workout {
   // ES6 class fields
   date = new Date();
   id = (Date.now() + "").slice(-10); // Bad Idea, but works for now
+  clicks = 0;
 
   constructor(coords, distance, duration) {
     this.coords = coords; // [lat, lng]
@@ -202,6 +206,11 @@ class Workout {
   _setDesc() {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
+  }
+
+  click() {
+    this.clicks++;
+    console.log(this.clicks);
   }
 }
 
