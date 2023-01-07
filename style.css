@@ -21,7 +21,7 @@ html {
 }
 
 body {
-  font-family: 'Manrope', sans-serif;
+  font-family: "Manrope", sans-serif;
   color: var(--color-light--2);
   font-weight: 400;
   line-height: 1.6;
@@ -173,8 +173,9 @@ a:visited {
 
 .copyright {
   margin-top: auto;
-  font-size: 1.3rem;
+  font-size: 1rem;
   text-align: center;
+  opacity: 0.4;
   color: var(--color-light--1);
 }
 
