@@ -46,6 +46,12 @@ class App {
     // part of Leaflet library (on())
     // add markers on the map where user clicked (handling clicks on map)
     this.#map.on("click", this._showForm.bind(this));
+
+
+    // to render markers map needs to be loaded first
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work);
+    });
   };
 
   _showForm(eMap) {
@@ -192,7 +198,8 @@ class App {
       pan: { duration: 1 }
     });
     // Using Public Interface
-    workout.click();
+    // When used on objects from local storage this method will not be inherited
+    // workout.click();
   }
 
   // Save workouts to the local store
@@ -204,9 +211,11 @@ class App {
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem("workouts"));
     if (!data) return; // guard clause
-
     this.#workouts = data;
-    this.#workouts.forEach(work => this._renderWorkout(work));
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+    });
+
   }
 
 }
@@ -230,7 +239,6 @@ class Workout {
 
   click() {
     this.clicks++;
-    console.log(this.clicks);
   }
 }
 
@@ -270,6 +278,4 @@ class Cycling extends Workout {
 }
 // Initializing the App class
 const app = new App();
-// const run1 = new Running([39, -12], 5.2, 24, 178);
-// const cycle1 = new Cycling([39, -12], 27, 95, 523);
-// console.log(run1, cycle1);
+
