@@ -13,6 +13,7 @@ const inputElevation = document.querySelector('.form__input--elevation');
 class App {
   #map; // Private Instance Properties
   #mapEvent;
+  #workouts = []; // Initialized with an empty arr
   constructor() { //Called immediately when a new instance of this class is created
     this._getPosition(); // gets current position at the start
     form.addEventListener("submit", this._newWorkout.bind(this));
@@ -58,51 +59,67 @@ class App {
     // Helper functions for validation
     const validInputs = (...inputs) => inputs.every(input => Number.isFinite(input));
     const positiveInts = (...inputs) => inputs.every(input => input > 0);
+
     e.preventDefault();
+
     // Get data from the form
     const type = inputType.value;
     // "+" transforms it into an integer
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
+    // packing coordinates for the class constructors
+    const { lat, lng } = this.#mapEvent.latlng;
+    const coords = [lat, lng];
+
+    // creating a variable to hold "workout" in the outside scope to use in methods
+    let workout;
     // Create an object depending on type of workout
     if (type === "running") {
       const cadence = +inputCadence.value;
+
       // Validation of data (checks for valid numbers)
       if (!validInputs(distance, duration, cadence) || !positiveInts(distance, duration, cadence)
       ) return alert("Inputs have to be positive numbers");
+
+      workout = new Running(coords, distance, duration, cadence);
     }
     if (type === "cycling") {
       const elevation = +inputElevation.value;
       // Validation of data
       if (!validInputs(distance, duration, elevation) || !positiveInts(distance, duration)
       ) return alert("Inputs have to be positive numbers");
+
+      workout = new Cycling(coords, distance, duration, elevation);
     }
 
 
-    //add new object to workout arr
-
+    // After Passing Validation Add new object to workout arr
+    this.#workouts.push(workout);
+    console.log(workout);
 
     // render workout on the list
-    // Display marker after form is filled and submitted
-    const { lat, lng } = this.#mapEvent.latlng;
-    const coords = [lat, lng];
 
+    // Display marker after form is filled and submitted
+    this.renderWorkoutMarker(workout);
+
+    // Clear input fields and hide form
+    inputCadence.value = inputDistance.value = inputDuration.value = inputElevation.value = "";
+    form.classList.add("hidden");
+  }
+
+  renderWorkoutMarker(workout) {
     // render workout on the map as marker
-    L.marker(coords)
+    L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(L.popup({
         maxWidth: 250,
         minWidth: 100,
         autoClose: false,
         closeOnClick: false,
-        className: "running-popup"
+        className: `${workout.type}-popup`
       }))
-      .setPopupContent("Workout")
+      .setPopupContent(`${workout.type}`)
       .openPopup();
-
-    // Clear input fields and hide form
-    inputCadence.value = inputDistance.value = inputDuration.value = inputElevation.value = "";
-    form.classList.add("hidden");
   }
 }
 
@@ -119,6 +136,7 @@ class Workout {
 }
 
 class Running extends Workout {
+  type = "running";
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
     this.cadence = cadence;
@@ -127,12 +145,13 @@ class Running extends Workout {
 
   calcPace() {
     // min per km
-    this.pace = this.duration / this.distance;
+    this.pace = (this.duration / this.distance).toFixed(2);
     return this.pace;
   }
 }
 
 class Cycling extends Workout {
+  type = "cycling";
   constructor(coords, distance, duration, elevGain) {
     super(coords, distance, duration);
     this.elevGain = elevGain;
@@ -141,7 +160,7 @@ class Cycling extends Workout {
 
   calcSpeed() {
     // kilometers per hour = kilometers / (hours + (minutes / 60))
-    this.speed = this.duration / (this.distance / 60);
+    this.speed = Math.round(this.duration / (this.distance / 60));
     return this.speed;
   }
 
