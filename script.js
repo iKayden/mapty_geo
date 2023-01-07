@@ -215,7 +215,12 @@ class App {
     this.#workouts.forEach(work => {
       this._renderWorkout(work);
     });
+  }
 
+  reset() {
+    // To do a big reset of the App. Do "app.reset()" in the console
+    localStorage.removeItem("workouts");
+    location.reload();
   }
 
 }
@@ -279,3 +284,18 @@ class Cycling extends Workout {
 // Initializing the App class
 const app = new App();
 
+// NOTES ON IMPROVING THIS APP --- EXTRA FEATURES
+// ------------- Great Tasks -------------------------
+// 1. Ability to edit a workout
+// 2. Ability to delete a workout
+// 3. Ability to delete all workouts
+// 4. Ability to sort workouts by a certain field (distance etc.)
+// 5. Re-build running and cycling objects coming from Local Storage
+// 6. Better error and confirmation messages
+// 7. Re-do the Looks to make it different
+// ------------- Very Hard Tasks -----------------------------
+// button to show all workouts on the map (leaflet lib)
+// ability to draw lines and shapes instead of just points
+// -------------- Death Mode Tasks ----------------------
+// Geocode Location from coordinates  ("Run In Faro, Portugal")
+// display weather data for workout time and place
